@@ -1,130 +1,102 @@
-Sistema de E-commerce — Modelo Relacional MySQL
+🧩 Modelo de Banco de Dados — Sistema de E-commerce
 📘 Descrição Geral
-Este projeto implementa um modelo de banco de dados relacional para um sistema de e-commerce, desenvolvido em MySQL 8 utilizando o MySQL Workbench.
+Este projeto apresenta o modelo relacional de um sistema de e-commerce, desenvolvido em MySQL Workbench, com foco na clareza dos relacionamentos entre entidades como Clientes, Produtos, Pedidos, Pagamentos e Entregas.
 
-O modelo foi projetado para representar de forma consistente as entidades fundamentais de uma loja virtual, incluindo Clientes, Produtos, Pedidos, Pagamentos e Entregas, com integridade referencial completa entre todas as tabelas.
+O arquivo principal (diagrama_eer.mwb) contém todo o modelo visual (EER Diagram), com todas as chaves estrangeiras (FKs) e relacionamentos físicos definidos.
 
-Todas as relações (FKs) estão implementadas no banco e visualmente representadas por linhas contínuas no diagrama EER, indicando integridade física real.
+💡 Este repositório disponibiliza o modelo visual completo, sem dados ou script SQL exportado.
+Ideal para fins acadêmicos, documentação de sistemas ou engenharia de software.
 
-🧩 Estrutura Conceitual
-O sistema foi modelado a partir de três narrativas principais:
+🧱 Estrutura do Projeto
+Arquivo incluso:
 
-1️⃣ Produto
-Os produtos são vendidos por uma única plataforma online.
+Arquivo	Descrição
+diagram_ecom_v2.mwb	Arquivo do MySQL Workbench contendo o modelo visual (EER Diagram) completo.
 
-Cada produto possui um fornecedor específico.
+Não incluso:
+
+Arquivo .sql (estrutura textual)
+
+Dados de exemplo (INSERTs)
+
+Triggers, procedures ou views
+
+🧩 Entidades Principais
+🛍️ Produto
+Cada produto possui um fornecedor.
 
 Um ou mais produtos podem compor um pedido.
 
-2️⃣ Cliente
+Produtos podem ser classificados em categorias.
+
+👤 Cliente
 O cliente pode se cadastrar com CPF ou CNPJ.
 
-O endereço do cliente determina o valor do frete.
+Cada cliente possui um ou mais endereços (envio e cobrança).
 
-O cliente pode realizar múltiplos pedidos e possui um prazo de devolução (carência).
+O endereço do cliente determina o frete.
 
-3️⃣ Pedido
-Os pedidos são criados pelos clientes e contêm informações de compra, entrega e status.
+Cada cliente pode realizar vários pedidos.
 
-Um ou mais produtos compõem cada pedido.
+📦 Pedido
+Criado por um cliente, contendo um ou mais produtos.
 
-O pedido pode ser cancelado.
+Armazena informações de status, frete e valores totais.
 
-Além dessas três narrativas principais, o modelo foi expandido para incluir as entidades de Entrega e Pagamento, garantindo uma visão completa do processo de compra.
+Pode ser cancelado ou devolvido dentro do prazo de carência.
 
-🗂️ Estrutura Física das Tabelas
-🧍 Tabelas de Pessoas e Endereços
-Tabela	Descrição
-clientes	Armazena dados pessoais ou empresariais (CPF/CNPJ, e-mail, telefone).
-enderecos_cliente	Permite múltiplos endereços (envio, cobrança), com indicadores de padrão.
+🚚 Entrega
+Cada pedido pode gerar uma ou mais remessas.
 
-🏢 Catálogo de Produtos
-Tabela	Descrição
-fornecedores	Cadastro dos fornecedores dos produtos.
-categorias	Classificação dos produtos por categoria.
-produtos	Itens disponíveis na plataforma, com preço, descrição e vínculo ao fornecedor.
-produto_categorias	Relação N:N entre produtos e categorias.
-estoques	Locais físicos de armazenamento.
-itens_estoque	Quantidade de cada produto em cada estoque.
+As remessas estão vinculadas a uma transportadora, com código de rastreio e status de entrega.
 
-📦 Pedidos e Itens
-Tabela	Descrição
-pedidos	Pedido principal, vinculado ao cliente, endereços e valores totais.
-itens_pedido	Produtos comprados em cada pedido, com preço histórico e quantidade.
+💳 Pagamento
+Cada pedido pode ter um ou mais pagamentos.
 
-🚚 Entregas
-Tabela	Descrição
-transportadoras	Empresas responsáveis pelo envio.
-remessas	Entregas vinculadas aos pedidos, com rastreamento e status.
+Suporta métodos como PIX, cartão de crédito, boleto, etc.
 
-💳 Pagamentos
-Tabela	Descrição
-metodos_pagamento	Tipos de pagamento disponíveis (PIX, Cartão, Boleto, etc.).
-pagamentos	Transações financeiras associadas aos pedidos, com valor, status e data.
+Armazena status da transação e valor pago.
 
 🔗 Relacionamentos Principais
 Origem	Destino	Tipo	Descrição
-clientes.id	enderecos_cliente.cliente_id	1:N	Um cliente pode ter vários endereços.
-fornecedores.id	produtos.fornecedor_id	1:N	Cada produto pertence a um fornecedor.
-produtos.id	itens_pedido.produto_id	1:N	Produtos são incluídos em pedidos.
-pedidos.id	itens_pedido.pedido_id	1:N	Cada pedido tem um ou mais itens.
-pedidos.id	remessas.pedido_id	1:N	Cada pedido pode gerar uma ou mais remessas.
-transportadoras.id	remessas.transportadora_id	1:N	Cada remessa é enviada por uma transportadora.
-pedidos.id	pagamentos.pedido_id	1:N	Cada pedido pode ter múltiplos pagamentos.
-metodos_pagamento.id	pagamentos.metodo_id	1:N	Cada pagamento utiliza um método.
+clientes	enderecos_cliente	1:N	Um cliente possui vários endereços.
+fornecedores	produtos	1:N	Cada produto pertence a um fornecedor.
+pedidos	itens_pedido	1:N	Um pedido possui um ou mais itens.
+produtos	itens_pedido	1:N	Produtos são vinculados a itens de pedido.
+pedidos	pagamentos	1:N	Cada pedido pode ter vários pagamentos.
+pedidos	remessas	1:N	Cada pedido pode ter várias entregas.
+transportadoras	remessas	1:N	Uma transportadora realiza várias remessas.
 
-⚙️ Configuração e Execução
-1️⃣ Criar o banco de dados
-sql
-Copiar código
-CREATE DATABASE ecom_v2
-  DEFAULT CHARACTER SET utf8mb4
-  DEFAULT COLLATE utf8mb4_0900_ai_ci;
-USE ecom_v2;
-2️⃣ Executar o script DDL
-Cole e execute o conteúdo do arquivo SQL (ecom_v2.sql) no editor do MySQL Workbench.
-Isso criará todas as tabelas e relações automaticamente.
+⚙️ Como abrir o diagrama
+Baixe o arquivo diagrama_eer.mwb.
 
-3️⃣ Verificar as tabelas criadas
-sql
-Copiar código
-SHOW TABLES;
-4️⃣ Visualizar o modelo no diagrama
-No Workbench:
+Abra o MySQL Workbench (versão 8.0 ou superior).
 
-pgsql
-Copiar código
-Database → Reverse Engineer → ecom_v2
-O diagrama EER será gerado com todas as linhas contínuas, representando as chaves estrangeiras físicas.
+Vá em File → Open Model...
+
+Selecione o arquivo .mwb.
+
+O diagrama EER será exibido automaticamente, com todas as tabelas e relações.
+
+💡 É possível gerar o script SQL completo usando
+File → Export → Forward Engineer SQL CREATE Script... dentro do Workbench.
 
 🧠 Observações Técnicas
-Engine: InnoDB (para suportar chaves estrangeiras e transações).
+Ferramenta: MySQL Workbench 8.0
 
-Charset: UTF8MB4 (suporte completo a acentuação e emojis).
+Engine: InnoDB (para suporte a chaves estrangeiras)
 
-Integridade referencial: Total (todas as FKs implementadas).
+Charset: UTF8MB4
 
-Status e enums: padronizados para facilitar filtros em consultas e aplicações.
+Integridade referencial: todas as FKs ativas (linhas contínuas no diagrama)
 
-Campos de auditoria: todas as tabelas principais incluem criado_em e atualizado_em.
+Status: modelo completo, sem dados de teste
 
-🧾 Exemplo de Fluxo de Uso
-1️⃣ Um cliente é cadastrado e insere dois endereços (envio e cobrança).
-2️⃣ Ele faz um pedido com três produtos de fornecedores distintos.
-3️⃣ O sistema calcula o frete com base no CEP do endereço de envio.
-4️⃣ O cliente realiza o pagamento via PIX (registrado na tabela pagamentos).
-5️⃣ Uma remessa é criada com status POSTADO e código de rastreamento.
-6️⃣ Após a entrega, o status muda para ENTREGUE.
-
-🧰 Próximos Passos (opcionais)
-Adicionar controle de cupons de desconto e códigos promocionais.
-
-Implementar logs de auditoria (histórico de status de pedidos).
-
-Adicionar tabela de usuários administrativos (gestores e operadores).
-
-Criar triggers para atualização automática de estoque.
+📜 Licença e Uso
+Este modelo pode ser utilizado livremente para fins acadêmicos, estudos e documentação de sistemas.
+Recomenda-se citar este repositório em trabalhos ou demonstrações.
 
 👨‍💻 Autor
 Yggor Ramos
-Projeto desenvolvido em MySQL Workbench 8.0, com foco em clareza de relacionamentos e normalização de dados.
+Projeto de modelagem de banco de dados para e-commerce, desenvolvido em MySQL Workbench.
+Contato profissional: www.linkedin.com/in/yggorramos
